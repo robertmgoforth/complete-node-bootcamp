@@ -48,13 +48,47 @@ const url = require('url');
 
 const port = 8040;
 
+const data = fs.readFileSync(`${__dirname}/dev-data/data.json`, "utf-8"); // __dirname returns the full file path of the current working directory
+const productData = JSON.parse(data);
+
 const server = http.createServer((req, res) => {
     console.log(req.url);  // returns: /fooBar from https://website.com/fooBar
     const pathName = req.url;
-    if (pathName === '/' || pathName === '/home') {
+    switch (pathName) {
+        case "/":
+            res.end("Hello from the server and welcome to the home page! This goes to the browser!");
+            break;
+        case "/home":
+            res.writeHead(200, { 'Content-Type': 'text/html' });
+            const homePage = "./templates/home.html"
+            res.end(homePage);
+            break;
+        case "/product":
+            res.writeHead(200, { 'Content-Type': 'text/html' });
+            const prodPage = "./templates/product.html"
+            res.end(prodPage);
+            break;
+        case "/api":
+            res.writeHead(200, {"Content-Type": "application/json"})
+            res.end(data);
+            break;
+    }
+    if (pathName === '/') {
         res.end("Hello from the server and welcome to the home page! This goes to the browser!");
+    } else if ( pathName === '/home') {
+        res.writeHead(200, { 'Content-Type': 'text/html' });
+        const homePage = "./templates/home.html"
+        res.end(homePage);
     } else if (pathName === '/product') {
-        res.end("This is the product page");
+        res.writeHead(200, { 'Content-Type': 'text/html' });
+        const prodPage = "./templates/product.html"
+        res.end(prodPage);
+    } else if (pathName === "/api") {
+        res.writeHead(200, {"Content-Type": "application/json"})
+        res.end(data);
+    } else {
+        res.writeHead(404, { 'Content-Type': 'text/html' });
+        res.end("<h1>Page not found</h1>");
     }
 });
 
